@@ -21,7 +21,9 @@ int main(int argc, char *argv[])
                 printf("  -n\t\tDo not overwrite an existing file\n");
                 exit(SUCCESS);
             case 'u':
-                printf("Usage: copy [OPTION] SOURCE DEST\n");
+                if (CHECK_KERNEL_SPACE_COPY_BIT(mode) || CHECK_MMAP_COPY_BIT(mode)) {
+                    printf("ERROR: Illegal argument passed: %s", argv[index]);
+                }
                 break;
             case 'k':
                 printf("Usage: copy [OPTION] SOURCE DEST\n");
