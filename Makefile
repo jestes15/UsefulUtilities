@@ -1,5 +1,6 @@
 C_COMPILER = gcc
-C_FLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -g
+C_FLAGS = -Wall -Wextra -Werror -pedantic -std=c17
+TARGET = copy
 
-all: $(TARGET)
-	$(C_COMPILER) $(C_FLAGS) -o ./build/$(TARGET) $(TARGET).c
+all: $(TARGET).c
+	$(C_COMPILER) $(C_FLAGS) -o $(TARGET) $(TARGET).c

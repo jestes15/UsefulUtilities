@@ -1,9 +1,12 @@
 #include "copy.h"
 
+
+
 // TODO: Add support for copying multiple files to a directory
 int main(int argc, char *argv[])
 {
     u_int8_t argument, index = 1;
+    char *source = NULL, *dest = NULL;
 
     for (argument = 1; argument < argc; ++argument)
     {
@@ -75,5 +78,30 @@ int main(int argc, char *argv[])
                 }
             }
         }
+        
+        else if (!CHECK_SOURCE_BIT(path_set)) {
+            source = argv[argument];
+            SOURCE_BIT_SET(path_set);
+        }
+
+        else if (!CHECK_DEST_BIT(path_set)) {
+            dest = argv[argument];
+            DEST_BIT_SET(path_set);
+        }
+    }
+
+    if (source == NULL) {
+        printf("ERROR: Source path not provided\n");
+        exit(SOURCE_PATH_NOT_VALID);
+    }
+    if (dest == NULL) {
+        printf("ERROR: Destiniation path not provided\n");
+        exit(NO_DESTINATION_PATH_PROVIDED);
+    }
+
+    if (CHECK_USER_SPACE_COPY_BIT(mode)) {
+        printf("%d\n", faccessat(AT_FDCWD, source, F_OK | R_OK | W_OK, AT_SYMLINK_NOFOLLOW));
+        printf("%d\n", faccessat(AT_FDCWD, dest, F_OK | R_OK | W_OK, AT_SYMLINK_NOFOLLOW));
+        printf("Value of errno: %s\n", strerror(errno));
     }
 }
