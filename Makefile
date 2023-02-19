@@ -1,5 +1,5 @@
-C_COMPILER = gcc
-C_FLAGS = -Wall -Wextra -Werror -pedantic -std=c17
+C_COMPILER = clang
+C_FLAGS = --std=c17 -lrt -pthread -I/usr/include
 TARGET = copy
 
 all: $(TARGET).c

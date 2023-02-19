@@ -1,9 +1,8 @@
 // SYSTEM INCLUDE FILES
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/uio.h>
-#include <sys/types.h>
-#include <sys/unistd.h>
 
 // C STANDARD LIBRARY INCLUDE FILES
 #include <errno.h>
@@ -11,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 enum file_operations
 {
@@ -30,13 +30,13 @@ enum return_codes
 };
 
 /*
-* operating modes
-* 0x01 - copy using user space
-* 0x02 - copy using sendfile
-* 0x04 - copy using mmap
-* 0x08 - enable force write
-* 0x10 - enable file protection
-*/
+ * operating modes
+ * 0x01 - copy using user space
+ * 0x02 - copy using sendfile
+ * 0x04 - copy using mmap
+ * 0x08 - enable force write
+ * 0x10 - enable file protection
+ */
 
 u_int8_t mode = 0;
 
@@ -53,12 +53,12 @@ u_int8_t mode = 0;
 #define CHECK_FILE_PROTECTION(x) ((x & 0x10) == 0x10)
 
 /*
-* Path Bits
-* 0x01 - Source path set
-* 0x02 - Source path set resulted in an error
-* 0x04 - Destination path set
-* 0x08 - Destination path set resulted in an error
-*/
+ * Path Bits
+ * 0x01 - Source path set
+ * 0x02 - Source path set resulted in an error
+ * 0x04 - Destination path set
+ * 0x08 - Destination path set resulted in an error
+ */
 
 u_int8_t path_set;
 

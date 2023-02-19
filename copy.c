@@ -1,7 +1,5 @@
 #include "copy.h"
 
-
-
 // TODO: Add support for copying multiple files to a directory
 int main(int argc, char *argv[])
 {
@@ -12,7 +10,7 @@ int main(int argc, char *argv[])
     {
         if (argv[argument][0] == '-')
         {
-            uint8_t len_of_arg = strlen(argv[argument]);
+            u_int8_t len_of_arg = strlen(argv[argument]);
             for (index = 1; index < len_of_arg; ++index)
             {
                 switch (argv[argument][index])
