@@ -54,3 +54,4 @@ dkms.conf
 # Build Directory
 build/
 copy
+*.txt
