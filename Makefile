@@ -1,5 +1,5 @@
 C_COMPILER = clang
-C_FLAGS = -lrt -pthread -I/usr/include -std=gnu17
+C_FLAGS = -pthread -I/usr/include -std=gnu17
 TARGET = copy
 
 all: $(TARGET).c
