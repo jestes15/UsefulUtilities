@@ -30,7 +30,9 @@ enum return_codes
     NO_DESTINATION_PATH_PROVIDED,
     DESTINATION_FILE_ALREADY_EXISTS,
     NO_SOURCE_OR_DESTINATION_PATH_PROVIDED,
-    USER_SPACE_COPY_FAILED
+    USER_SPACE_COPY_FAILED,
+    KERNEL_SPACE_COPY_FAILED,
+    MMAP_COPY_FAILED
 };
 
 /*
@@ -77,3 +79,5 @@ u_int8_t path_set;
 #define CHECK_DEST_ERRPR_BIT(x) ((x & 0x08) == 0x08)
 
 int user_space_copy(char *, char *);
+int kernel_space_copy(char *, char *);
+int mmap_copy(char *, char *);

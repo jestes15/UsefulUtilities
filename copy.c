@@ -99,26 +99,51 @@ int main(int argc, char *argv[])
         exit(NO_SOURCE_OR_DESTINATION_PATH_PROVIDED);
     }
 
+    if (faccessat(AT_FDCWD, source, F_OK | R_OK | W_OK, AT_SYMLINK_NOFOLLOW) != 0)
+    {
+        printf("ERROR: Source file does not exist or is not readable\n");
+        exit(SOURCE_FILE_NOT_VALID);
+    }
+
+    if (faccessat(AT_FDCWD, dest, F_OK | R_OK | W_OK, AT_SYMLINK_NOFOLLOW) == 0)
+    {
+        if (CHECK_FORCE_WRITE(mode))
+        {
+            printf("WARNING: Destination file already exists and will be overwritten\n");
+        }
+        else if (CHECK_FILE_PROTECTION(mode))
+        {
+            printf("ERROR: Destination file already exists\n");
+            exit(DESTINATION_FILE_ALREADY_EXISTS);
+        }
+    }
+
     if (CHECK_USER_SPACE_COPY_BIT(mode))
     {
-        if (faccessat(AT_FDCWD, source, F_OK | R_OK | W_OK, AT_SYMLINK_NOFOLLOW) != 0)
+        if (user_space_copy(source, dest) != SUCCESS)
         {
-            printf("ERROR: Source file does not exist or is not readable\n");
-            exit(SOURCE_FILE_NOT_VALID);
+            printf("ERROR: User space copy failed\n");
+            exit(USER_SPACE_COPY_FAILED);
         }
-        if (faccessat(AT_FDCWD, dest, F_OK | R_OK | W_OK, AT_SYMLINK_NOFOLLOW) == 0)
+    }
+    else if (CHECK_KERNEL_SPACE_COPY_BIT(mode))
+    {
+        if (kernel_space_copy(source, dest) != SUCCESS)
         {
-            if (CHECK_FORCE_WRITE(mode))
-            {
-                printf("WARNING: Destination file already exists and will be overwritten\n");
-            }
-            else if (CHECK_FILE_PROTECTION(mode))
-            {
-                printf("ERROR: Destination file already exists\n");
-                exit(DESTINATION_FILE_ALREADY_EXISTS);
-            }
+            printf("ERROR: Kernel space copy failed\n");
+            exit(KERNEL_SPACE_COPY_FAILED);
         }
-
+    }
+    else if (CHECK_MMAP_COPY_BIT(mode))
+    {
+        if (mmap_copy(source, dest) != SUCCESS)
+        {
+            printf("ERROR: Mmap copy failed\n");
+            exit(MMAP_COPY_FAILED);
+        }
+    }
+    else
+    {
         if (user_space_copy(source, dest) != SUCCESS)
         {
             printf("ERROR: User space copy failed\n");
@@ -173,4 +198,12 @@ int user_space_copy(char *src, char *dest)
     }
 
     return SUCCESS;
+}
+
+int kernel_space_copy(char *src, char *dest)
+{
+}
+
+int mmap_copy(char *src, char *dest)
+{
 }
