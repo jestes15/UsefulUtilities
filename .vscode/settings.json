@@ -1,10 +1,6 @@
 {
     "files.associations": {
-        "unistd.h": "c",
-        "fcntl.h": "c",
-        "fcntl2.h": "c",
-        "unistd_64.h": "c",
         "uio.h": "c",
-        "stat.h": "c"
+        "unistd.h": "c"
     }
 }

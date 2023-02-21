@@ -202,6 +202,46 @@ int user_space_copy(char *src, char *dest)
 
 int kernel_space_copy(char *src, char *dest)
 {
+    int source_fd, dest_fd, error;
+    struct stat st;
+    off_t offset = 0, size_of_file = 0;
+    int rv = 0;
+
+    stat(src, &st);
+    size_of_file = st.st_size;
+
+    if ((source_fd = open(src, O_RDONLY)) < 0)
+    {
+        printf("ERROR: Failed to open source file: %s\n", strerror(errno));
+        return FAILED_TO_OPEN_FILE;
+    }
+
+    if ((dest_fd = open(dest, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+    {
+        printf("ERROR: Failed to open destination file: %s\n", strerror(errno));
+        return FAILED_TO_OPEN_FILE;
+    }
+
+    if ((rv = copy_file_range(dest_fd, source_fd, offset, &size_of_file, NULL, 0)) < 0) {
+        if ((error = errno) != 0) {
+		    printf("Warning: sendfile(3EXT) returned %d (errno %d)\n", rv, errno);
+            printf("%s\n", strerror(errno));
+        }
+	}
+
+    if (close(source_fd) < 0)
+    {
+        printf("ERROR: Failed to close source file: %s\n", strerror(errno));
+        return FAILED_TO_CLOSE_FILE;
+    }
+
+    if (close(dest_fd) < 0)
+    {
+        printf("ERROR: Failed to close destination file: %s\n", strerror(errno));
+        return FAILED_TO_CLOSE_FILE;
+    }
+
+    return SUCCESS;
 }
 
 int mmap_copy(char *src, char *dest)

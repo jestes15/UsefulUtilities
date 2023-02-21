@@ -1,8 +1,8 @@
 // SYSTEM INCLUDE FILES
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
+#include <sys/socket.h>
 
 // C STANDARD LIBRARY INCLUDE FILES
 #include <errno.h>
