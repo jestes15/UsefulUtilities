@@ -222,12 +222,14 @@ int kernel_space_copy(char *src, char *dest)
         return FAILED_TO_OPEN_FILE;
     }
 
-    if ((rv = copy_file_range(dest_fd, source_fd, offset, &size_of_file, NULL, 0)) < 0) {
-        if ((error = errno) != 0) {
-		    printf("Warning: sendfile(3EXT) returned %d (errno %d)\n", rv, errno);
+    if ((rv = sendfile(dest_fd, source_fd, &offset, size_of_file)) < 0)
+    {
+        if ((error = errno) != 0)
+        {
+            printf("Warning: sendfile(3EXT) returned %d (errno %d)\n", rv, errno);
             printf("%s\n", strerror(errno));
         }
-	}
+    }
 
     if (close(source_fd) < 0)
     {
@@ -246,4 +248,77 @@ int kernel_space_copy(char *src, char *dest)
 
 int mmap_copy(char *src, char *dest)
 {
+    int source_fd, dest_fd;
+
+    if ((source_fd = open(src, O_RDONLY)) < 0)
+    {
+        printf("ERROR: Failed to open source file: %s\n", strerror(errno));
+        return FAILED_TO_OPEN_FILE;
+    }
+
+    if ((dest_fd = open(dest, O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0)
+    {
+        printf("ERROR: Failed to open destination file: %s\n", strerror(errno));
+        return FAILED_TO_OPEN_FILE;
+    }
+
+    struct stat src_sz;
+    stat(src, &src_sz);
+    off_t size_of_file_source = src_sz.st_size;
+
+    lseek(dest_fd, 4 * 10 + 1, SEEK_SET);
+    write(dest_fd, "", 1);
+    lseek(dest_fd, 0, SEEK_SET);
+
+    char *src_map = mmap(NULL, size_of_file_source, PROT_READ, MAP_PRIVATE, source_fd, 0);
+    if (src_map == MAP_FAILED)
+    {
+        printf("ERROR: Failed to map source file: %s\n", strerror(errno));
+        return FAILED_TO_MMAP_SOURCE_FILE;
+    }
+
+    char *dest_map = mmap(NULL, size_of_file_source, PROT_WRITE, MAP_SHARED, dest_fd, 0);
+    if (dest_map == MAP_FAILED)
+    {
+        printf("ERROR: Failed to map destination file: %s\n", strerror(errno));
+        return FAILED_TO_MMAP_DESTINATION_FILE;
+    }
+
+    printf("Copying %s to %s using mmap\n", src, dest);
+
+    memcpy(dest_map, src_map, size_of_file_source);
+
+    printf("Finished copying %s to %s using mmap\n", src, dest);
+
+    if (munmap(src_map, size_of_file_source) < 0)
+    {
+        printf("ERROR: Failed to unmap source file: %s\n", strerror(errno));
+        return FAILED_TO_MUNMAP_SOURCE_FILE;
+    }
+
+    if (munmap(dest_map, size_of_file_source) < 0)
+    {
+        printf("ERROR: Failed to unmap destination file: %s\n", strerror(errno));
+        return FAILED_TO_MUNMAP_DESTINATION_FILE;
+    }
+
+    if (msync(dest_map, size_of_file_source, MS_SYNC))
+    {
+        printf("ERROR: Failed to sync destination file: %s\n", strerror(errno));
+        return FAILED_TO_SYNC_DESTINATION_FILE;
+    }
+
+    if (close(source_fd) < 0)
+    {
+        printf("ERROR: Failed to close source file: %s\n", strerror(errno));
+        return FAILED_TO_CLOSE_FILE;
+    }
+
+    if (close(dest_fd) < 0)
+    {
+        printf("ERROR: Failed to close destination file: %s\n", strerror(errno));
+        return FAILED_TO_CLOSE_FILE;
+    }
+
+    return SUCCESS;
 }

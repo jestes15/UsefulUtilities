@@ -2,7 +2,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
-#include <sys/socket.h>
+#include <sys/sendfile.h>
+#include <sys/mman.h>
 
 // C STANDARD LIBRARY INCLUDE FILES
 #include <errno.h>
@@ -14,10 +15,19 @@
 
 enum file_operations
 {
-    FAILED_TO_OPEN_FILE = 1,
+    FAILED_TO_OPEN_FILE = 11,
     FAILED_TO_READ_FROM_FILE,
     FAILED_TO_WRITE_TO_FILE,
     FAILED_TO_CLOSE_FILE
+};
+
+enum mmap_operations
+{
+    FAILED_TO_MMAP_SOURCE_FILE = 15,
+    FAILED_TO_MMAP_DESTINATION_FILE,
+    FAILED_TO_MUNMAP_SOURCE_FILE,
+    FAILED_TO_MUNMAP_DESTINATION_FILE,
+    FAILED_TO_SYNC_DESTINATION_FILE
 };
 
 enum return_codes
