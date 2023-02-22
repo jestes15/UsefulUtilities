@@ -266,7 +266,7 @@ int mmap_copy(char *src, char *dest)
     stat(src, &src_sz);
     off_t size_of_file_source = src_sz.st_size;
 
-    lseek(dest_fd, 4 * 10 + 1, SEEK_SET);
+    lseek(dest_fd, size_of_file_source - 1, SEEK_SET);
     write(dest_fd, "", 1);
     lseek(dest_fd, 0, SEEK_SET);
 
@@ -300,12 +300,6 @@ int mmap_copy(char *src, char *dest)
     {
         printf("ERROR: Failed to unmap destination file: %s\n", strerror(errno));
         return FAILED_TO_MUNMAP_DESTINATION_FILE;
-    }
-
-    if (msync(dest_map, size_of_file_source, MS_SYNC))
-    {
-        printf("ERROR: Failed to sync destination file: %s\n", strerror(errno));
-        return FAILED_TO_SYNC_DESTINATION_FILE;
     }
 
     if (close(source_fd) < 0)
