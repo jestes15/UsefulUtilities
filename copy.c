@@ -1,6 +1,7 @@
 #include "copy.h"
 
 // TODO: Add support for copying multiple files to a directory
+// TODO: Add support for copying directories - https://github.com/coreutils/coreutils/blob/3edbf016be774e266a659349f513fe265c842e26/src/copy.c#L741
 int main(int argc, char *argv[])
 {
     u_int8_t argument, index = 1;
@@ -71,6 +72,20 @@ int main(int argc, char *argv[])
                         exit(ILLEGAL_OPTIONS_PASSED);
                     }
                     ENABLE_FILE_PROTECTION(mode);
+                    break;
+                case 'v':
+                    printf("copy version 1.0\n");
+                    exit(SUCCESS);
+                    break;
+                case 't':
+                    if (argument + 2 != argc)
+                    {
+                        printf("ERROR: Missing argument for option t\n");
+                        exit(MISSING_ARGUMENT_FOR_OPTION);
+                    }
+
+                    list_dir(argv[argument + 1]);
+                    exit(SUCCESS);
                     break;
                 default:
                     printf("ERROR: Illegal argument passed: %c\n", argv[argument][index]);
@@ -315,4 +330,21 @@ int mmap_copy(char *src, char *dest)
     }
 
     return SUCCESS;
+}
+
+void list_dir(const char *path)
+{
+    struct dirent *entry;
+    DIR *dir = opendir(path);
+    if (dir == NULL)
+    {
+        return;
+    }
+
+    while ((entry = readdir(dir)) != NULL)
+    {
+        printf("%s\n", entry->d_name);
+    }
+
+    closedir(dir);
 }

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <dirent.h>
 
 enum file_operations
 {
@@ -42,7 +43,8 @@ enum return_codes
     NO_SOURCE_OR_DESTINATION_PATH_PROVIDED,
     USER_SPACE_COPY_FAILED,
     KERNEL_SPACE_COPY_FAILED,
-    MMAP_COPY_FAILED
+    MMAP_COPY_FAILED,
+    MISSING_ARGUMENT_FOR_OPTION
 };
 
 /*
@@ -91,3 +93,4 @@ u_int8_t path_set;
 int user_space_copy(char *, char *);
 int kernel_space_copy(char *, char *);
 int mmap_copy(char *, char *);
+void list_dir(const char *);
