@@ -5,7 +5,8 @@
 int main(int argc, char *argv[])
 {
     u_int8_t argument, index = 1;
-    char *source = NULL, *dest = NULL;
+    char *source = NULL;
+    char *dest = NULL;
 
     for (argument = 1; argument < argc; ++argument)
     {
@@ -27,7 +28,6 @@ int main(int argc, char *argv[])
                     printf("  -n\tDo not overwrite an existing file\n\n");
                     printf("If no options are specified, the default is to use the user space copy method and not overwrite files\n");
                     exit(SUCCESS);
-                    break;
                 case 'u':
                     if (CHECK_KERNEL_SPACE_COPY_BIT(mode) || CHECK_MMAP_COPY_BIT(mode))
                     {
@@ -332,19 +332,59 @@ int mmap_copy(char *src, char *dest)
     return SUCCESS;
 }
 
-void list_dir(const char *path)
+int count_files(char *path)
 {
+    int count = 0;
     struct dirent *entry;
-    DIR *dir = opendir(path);
-    if (dir == NULL)
+    DIR *dir;
+    if ((dir = opendir(path)) == NULL)
     {
-        return;
-    }
+        printf("ERROR: Failed to open directory: %s\n", strerror(errno));
+        return FAILED_TO_OPEN_DIRECTORY;
+    };
 
     while ((entry = readdir(dir)) != NULL)
-    {
-        printf("%s\n", entry->d_name);
-    }
+        count++;
 
     closedir(dir);
+    return count;
+}
+
+void list_dir(const char *path)
+{
+    int size_of_file_array = count_files(path);
+
+    
+
+    struct dirent *entry;
+    DIR *dir;
+    if ((dir = opendir(path)) == NULL)
+    {
+        printf("ERROR: Failed to open directory: %s\n", strerror(errno));
+        return;
+    };
+
+    while ((entry = readdir(dir)) != NULL)
+        printf("%-25sis dir: %d\n", entry->d_name, is_directory(entry->d_name));
+
+    closedir(dir);
+}
+
+int copy_directory(char *src, char *dest)
+{
+    return SUCCESS;
+}
+
+int is_directory(const char *path)
+{
+    struct stat path_stat;
+    stat(path, &path_stat);
+    return S_ISDIR(path_stat.st_mode);
+}
+
+int is_regular_file(const char *path)
+{
+    struct stat path_stat;
+    stat(path, &path_stat);
+    return S_ISREG(path_stat.st_mode);
 }

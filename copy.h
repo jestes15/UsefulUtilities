@@ -19,7 +19,8 @@ enum file_operations
     FAILED_TO_OPEN_FILE = 11,
     FAILED_TO_READ_FROM_FILE,
     FAILED_TO_WRITE_TO_FILE,
-    FAILED_TO_CLOSE_FILE
+    FAILED_TO_CLOSE_FILE,
+    FAILED_TO_OPEN_DIRECTORY
 };
 
 enum mmap_operations
@@ -94,3 +95,6 @@ int user_space_copy(char *, char *);
 int kernel_space_copy(char *, char *);
 int mmap_copy(char *, char *);
 void list_dir(const char *);
+int copy_directory(char *, char *);
+int is_regular_file(const char *);
+int is_directory(const char *);
