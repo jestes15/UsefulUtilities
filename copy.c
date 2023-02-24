@@ -176,6 +176,7 @@ int user_space_copy(char *src, char *dest)
     if ((source_fd = open(src, O_RDONLY)) < 0)
     {
         printf("ERROR: Failed to open source file: %s\n", strerror(errno));
+        printf("ERROR: %s\n", src);
         return FAILED_TO_OPEN_FILE;
     }
 
@@ -365,7 +366,7 @@ info count_files(char *path)
     return data;
 }
 
-files list_dir(char *path)
+files count_files_and_dirs(char *path)
 {
     info data = count_files(path);
     struct dirent *entry;
@@ -405,22 +406,16 @@ files list_dir(char *path)
     return path_data;
 }
 
-int compare(const void *a, const void *b)
-{
-    return strcmp(*(const char **)a, *(const char **)b) > 0;
-}
-
 int copy_directory(char *src, char *dest)
 {
-    files file_list = list_dir(src);
+    files file_list = count_files_and_dirs(src);
 
     struct stat path_stat;
     if (stat(dest, &path_stat) == -1)
     {
-        mkdir(dest, S_IRWXO | S_IRWXG | S_IRWXU);
+        mkdir(dest, S_IRWXG | S_IRWXU);
     }
 
-    // copy directories into destination directory
     for (int i = 0; i < file_list.dir_count; i++)
     {
         char *dir_name = *(file_list.dir_list + i);
@@ -441,16 +436,24 @@ int copy_directory(char *src, char *dest)
         strcat(dest_dir_path, "/");
         strcat(dest_dir_path, dir_name);
 
+        // printf("Copying directory %s to %s\n", src_dir_path, dest_dir_path);
+
         copy_directory(src_dir_path, dest_dir_path);
 
         free(src_dir_path);
         free(dest_dir_path);
     }
 
-    // copy files into destination directory
     for (int i = 0; i < file_list.file_count; i++)
     {
         char *file_name = *(file_list.file_list + i);
+
+        struct stat path_stat;
+        stat(dest, &path_stat);
+
+        if (path_stat.st_mode & S_IFDIR) {
+            continue;
+        }
 
         char *src_file_path = malloc(strlen(src) + strlen(file_name) + 2);
         char *dest_file_path = malloc(strlen(dest) + strlen(file_name) + 2);
@@ -463,6 +466,11 @@ int copy_directory(char *src, char *dest)
         strcat(dest_file_path, "/");
         strcat(dest_file_path, file_name);
 
+        printf("src file %s\n", src_file_path);
+        printf("dest file %s\n", dest_file_path);
+
+        // printf("Copying file %s to %s\n", src_file_path, dest_file_path);
+
         user_space_copy(src_file_path, dest_file_path);
 
         free(src_file_path);
@@ -470,18 +478,4 @@ int copy_directory(char *src, char *dest)
     }
 
     return 0;
-}
-
-int is_directory(const char *path)
-{
-    struct stat path_stat;
-    stat(path, &path_stat);
-    return S_ISDIR(path_stat.st_mode);
-}
-
-int is_regular_file(const char *path)
-{
-    struct stat path_stat;
-    stat(path, &path_stat);
-    return S_ISREG(path_stat.st_mode);
 }
