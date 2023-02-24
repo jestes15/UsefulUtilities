@@ -91,10 +91,18 @@ u_int8_t path_set;
 #define CHECK_DEST_BIT(x) ((x & 0x04) == 0x04)
 #define CHECK_DEST_ERRPR_BIT(x) ((x & 0x08) == 0x08)
 
+struct information {
+    int amount_of_files;
+    int amount_of_directories;
+};
+
+typedef struct information info;
+
 int user_space_copy(char *, char *);
 int kernel_space_copy(char *, char *);
 int mmap_copy(char *, char *);
-void list_dir(const char *);
+char** list_dir(char *, size_t *);
 int copy_directory(char *, char *);
 int is_regular_file(const char *);
 int is_directory(const char *);
+struct information count_files(char *);

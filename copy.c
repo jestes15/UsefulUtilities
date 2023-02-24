@@ -2,7 +2,8 @@
 
 // TODO: Add support for copying multiple files to a directory
 // TODO: Add support for copying directories - https://github.com/coreutils/coreutils/blob/3edbf016be774e266a659349f513fe265c842e26/src/copy.c#L741
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
     u_int8_t argument, index = 1;
     char *source = NULL;
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
                         exit(MISSING_ARGUMENT_FOR_OPTION);
                     }
 
-                    list_dir(argv[argument + 1]);
+                    copy_directory(argv[argument + 1], ".");
                     exit(SUCCESS);
                     break;
                 default:
@@ -167,7 +168,8 @@ int main(int argc, char *argv[])
     }
 }
 
-int user_space_copy(char *src, char *dest)
+int
+user_space_copy(char *src, char *dest)
 {
     int source_fd, dest_fd;
     char buffer[1024];
@@ -215,7 +217,8 @@ int user_space_copy(char *src, char *dest)
     return SUCCESS;
 }
 
-int kernel_space_copy(char *src, char *dest)
+int
+kernel_space_copy(char *src, char *dest)
 {
     int source_fd, dest_fd, error;
     struct stat st;
@@ -261,7 +264,8 @@ int kernel_space_copy(char *src, char *dest)
     return SUCCESS;
 }
 
-int mmap_copy(char *src, char *dest)
+int
+mmap_copy(char *src, char *dest)
 {
     int source_fd, dest_fd;
 
@@ -332,57 +336,120 @@ int mmap_copy(char *src, char *dest)
     return SUCCESS;
 }
 
-int count_files(char *path)
+struct information
+count_files(char *path)
 {
-    int count = 0;
+    int count_files = 0;
+    int count_directories = 0;
     struct dirent *entry;
     DIR *dir;
     if ((dir = opendir(path)) == NULL)
     {
         printf("ERROR: Failed to open directory: %s\n", strerror(errno));
-        return FAILED_TO_OPEN_DIRECTORY;
+        exit(FAILED_TO_OPEN_DIRECTORY);
     };
 
     while ((entry = readdir(dir)) != NULL)
-        count++;
+    {
+        if (entry->d_type == DT_REG)
+        {
+            count_files++;
+        }
+        else if (entry->d_type == DT_DIR)
+        {
+            count_directories++;
+        }
+    }
 
     closedir(dir);
-    return count;
+
+    info data = { 
+        .amount_of_files = count_files, 
+        .amount_of_directories = count_directories 
+    };
+
+    return data;
 }
 
-void list_dir(const char *path)
+char**
+list_dir(char *path, size_t *size)
 {
-    int size_of_file_array = count_files(path);
-
-    
-
+    info data = count_files(path);
     struct dirent *entry;
     DIR *dir;
+    char** file_names = malloc(sizeof(char*) * data.amount_of_files);
+    char** directory_names = malloc(sizeof(char*) * data.amount_of_directories);
+
     if ((dir = opendir(path)) == NULL)
     {
         printf("ERROR: Failed to open directory: %s\n", strerror(errno));
-        return;
+        exit(FAILED_TO_OPEN_DIRECTORY);
     };
 
-    while ((entry = readdir(dir)) != NULL)
-        printf("%-25sis dir: %d\n", entry->d_name, is_directory(entry->d_name));
+    u_int64_t index = 0;
+    while ((entry = readdir(dir)) != NULL) {
+        *(file_names + index) = entry->d_name;
+        index++;
+    }
+
+    *size = size_of_file_array;
 
     closedir(dir);
+    return file_names;
 }
 
-int copy_directory(char *src, char *dest)
+int
+compare(const void *a, const void *b)
 {
-    return SUCCESS;
+    return strcmp(*(const char**)a, *(const char**)b) < 0;
 }
 
-int is_directory(const char *path)
+int
+copy_directory(char *src, char *dest)
+{
+    u_int64_t amount_of_files;
+    char ** file_list = list_dir(src, &amount_of_files);
+
+    printf("Amount of files: %lu\n", amount_of_files);
+
+    for (u_int64_t index = 0; index < amount_of_files; index++)
+        printf("%s\n", *(file_list + index));
+
+    qsort(file_list, amount_of_files, sizeof(char*), compare);
+    printf("\n\n");
+
+    for (u_int64_t index = 0; index < amount_of_files; index++) {
+        printf("%s\n", *(file_list + index));
+        /*char *file_name = *(file_list + index);
+        char *src_file = malloc(strlen(src) + strlen(file_name) + 1);
+        char *dest_file = malloc(strlen(dest) + strlen(file_name) + 1);
+
+        strcpy(src_file, src);
+        strcat(src_file, file_name);
+
+        strcpy(dest_file, dest);
+        strcat(dest_file, file_name);
+
+        if (is_directory(src_file)) {
+            mkdir(dest_file, 0755);
+            copy_directory(src_file, dest_file);
+        } else if (is_regular_file(src_file)) {
+            mmap_copy(src_file, dest_file);
+        }*/
+    }
+    return 0;
+}
+
+int
+is_directory(const char *path)
 {
     struct stat path_stat;
     stat(path, &path_stat);
     return S_ISDIR(path_stat.st_mode);
 }
 
-int is_regular_file(const char *path)
+int 
+is_regular_file(const char *path)
 {
     struct stat path_stat;
     stat(path, &path_stat);
