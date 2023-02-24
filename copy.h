@@ -20,7 +20,8 @@ enum file_operations
     FAILED_TO_READ_FROM_FILE,
     FAILED_TO_WRITE_TO_FILE,
     FAILED_TO_CLOSE_FILE,
-    FAILED_TO_OPEN_DIRECTORY
+    FAILED_TO_OPEN_DIRECTORY,
+    FAILED_TO_COPY_FILE
 };
 
 enum mmap_operations
@@ -91,18 +92,30 @@ u_int8_t path_set;
 #define CHECK_DEST_BIT(x) ((x & 0x04) == 0x04)
 #define CHECK_DEST_ERRPR_BIT(x) ((x & 0x08) == 0x08)
 
-struct information {
+struct information
+{
     int amount_of_files;
     int amount_of_directories;
 };
 
+struct files_and_directories
+{
+    char **file_list;
+    char **dir_list;
+
+    u_int64_t file_count;
+    u_int64_t dir_count;
+};
+
 typedef struct information info;
+typedef struct files_and_directories files;
 
 int user_space_copy(char *, char *);
 int kernel_space_copy(char *, char *);
 int mmap_copy(char *, char *);
-char** list_dir(char *, size_t *);
+files list_dir(char *);
 int copy_directory(char *, char *);
+int copy_file(char *, char *);
 int is_regular_file(const char *);
 int is_directory(const char *);
 struct information count_files(char *);
