@@ -1,7 +1,6 @@
 #include "copy.h"
 
 // TODO: Add support for copying multiple files to a directory
-// TODO: Add support for copying directories - https://github.com/coreutils/coreutils/blob/3edbf016be774e266a659349f513fe265c842e26/src/copy.c#L741
 int main(int argc, char *argv[])
 {
     u_int8_t argument, index = 1;
@@ -77,7 +76,7 @@ int main(int argc, char *argv[])
                     printf("copy version 1.0\n");
                     exit(SUCCESS);
                     break;
-                case 't':
+                case 'd':
                     if (argument + 3 != argc)
                     {
                         printf("ERROR: Missing argument for option t\n");
@@ -436,8 +435,6 @@ int copy_directory(char *src, char *dest)
         strcat(dest_dir_path, "/");
         strcat(dest_dir_path, dir_name);
 
-        // printf("Copying directory %s to %s\n", src_dir_path, dest_dir_path);
-
         copy_directory(src_dir_path, dest_dir_path);
 
         free(src_dir_path);
@@ -465,11 +462,6 @@ int copy_directory(char *src, char *dest)
         strcpy(dest_file_path, dest);
         strcat(dest_file_path, "/");
         strcat(dest_file_path, file_name);
-
-        printf("src file %s\n", src_file_path);
-        printf("dest file %s\n", dest_file_path);
-
-        // printf("Copying file %s to %s\n", src_file_path, dest_file_path);
 
         user_space_copy(src_file_path, dest_file_path);
 
