@@ -30,6 +30,7 @@ struct WAV_HEADER
 
 
 void print_data(WAV_HEADER &wavHeader, uint_fast64_t time_delta, uint64_t numSamples) {
+    std::cout << wavHeader.RIFF << std::endl;
         std::cout << "RIFF header:\t\t\t" << wavHeader.RIFF[0] << wavHeader.RIFF[1] << wavHeader.RIFF[2] << wavHeader.RIFF[3] << std::endl;
         std::cout << "WAVE header:\t\t\t" << wavHeader.WAVE[0] << wavHeader.WAVE[1] << wavHeader.WAVE[2] << wavHeader.WAVE[3] << std::endl;
         std::cout << "FMT:\t\t\t\t" << wavHeader.fmt[0] << wavHeader.fmt[1] << wavHeader.fmt[2] << wavHeader.fmt[3] << std::endl;

@@ -1,6 +1,7 @@
 #include <ctime>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 int main(int argc, char** argv) {
     if (argc != 3) {

@@ -9,7 +9,6 @@ int main(int argc, char *argv[])
     std::cout << "Input wav file: ";
     std::cin >> input;
 
-    //FILE *wavFile = fopen(input.c_str(), "r");
     auto wavFile_input = std::ifstream(input, std::ios::binary);
     if (!wavFile_input)
     {
