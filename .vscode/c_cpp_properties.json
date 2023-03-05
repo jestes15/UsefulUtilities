@@ -7,11 +7,10 @@
                 "/usr/include/**"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/clang",
-            "intelliSenseMode": "linux-clang-arm64",
+            "compilerPath": "/usr/bin/g++-12.2",
+            "intelliSenseMode": "linux-gcc-arm64",
             "cStandard": "gnu17",
-            "cppStandard": "gnu++20",
-            "configurationProvider": "ms-vscode.makefile-tools"
+            "cppStandard": "gnu++20"
         }
     ],
     "version": 4
