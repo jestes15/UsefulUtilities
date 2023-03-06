@@ -1,17 +1,15 @@
-// part1c.cpp
-#define NUMBEROFSTATIONS 5
-
 #include <fstream>
 #include <iostream>
 #include <cmath>
 #include <vector>
 
 const double TIMESLOTLENGTH = 51.2;
+const int8_t NUMBER_OF_STATIONS{5};
 
 // data hold by array for each station
-int nextSlot[NUMBEROFSTATIONS] = {0, 0, 0, 0, 0};
-int collisions[NUMBEROFSTATIONS] = {0, 0, 0, 0, 0};
-bool hasTx[NUMBEROFSTATIONS] = {0, 0, 0, 0, 0};
+int nextSlot[NUMBER_OF_STATIONS] = {0, 0, 0, 0, 0};
+int collisions[NUMBER_OF_STATIONS] = {0, 0, 0, 0, 0};
+bool hasTx[NUMBER_OF_STATIONS] = {0, 0, 0, 0, 0};
 
 // input file object
 std::ifstream random_numbers_file("Part1_rn.txt");
@@ -27,7 +25,7 @@ int main()
     {
         std::vector<int> stationsTransmitting;
 
-        for (int station = 0; station < NUMBEROFSTATIONS; ++station)
+        for (int station = 0; station < NUMBER_OF_STATIONS; ++station)
         {
             if (nextSlot[station] == slot)
             {

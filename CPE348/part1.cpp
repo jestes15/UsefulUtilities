@@ -3,22 +3,28 @@
 #include <cmath>
 #include <vector>
 
-const double TIMESLOTLENGTH{51.2};
-const uint8_t NUMBEROFSTATIONS{5};
+typedef double f64;
+
+const f64 TIMESLOTLENGTH{51.2};
+const uint8_t NUMBER_OF_STATIONS{5};
 
 // array holding data for each station
-int nextSlot[NUMBEROFSTATIONS] = {0, 0, 0, 0, 0};
-int collisions[NUMBEROFSTATIONS] = {0, 0, 0, 0, 0};
+int nextSlot[NUMBER_OF_STATIONS] = {0, 0, 0, 0, 0};
+int collisions[NUMBER_OF_STATIONS] = {0, 0, 0, 0, 0};
 
-// input file path
-std::ifstream random_numbers_file("Part1_rn.txt");
+int getNextRandom(std::ifstream file)
+{
+    int currentNumber;
+    if (file >> currentNumber)
+        return currentNumber;
+    return 0;
+}
 
-// randomly select the number from the file
-int getNextRandom();
 void printLineSeparator();
 
 int main()
 {
+    std::ifstream rand_numbers("Part1_rn.txt");
     int slot = 0;
     while (1)
     {
@@ -28,7 +34,7 @@ int main()
         std::vector<int> stationsTransmitting;
 
         // display list of stations transmitting
-        for (int station = 0; station < NUMBEROFSTATIONS; ++station)
+        for (int station = 0; station < NUMBER_OF_STATIONS; ++station)
         {
             if (nextSlot[station] == slot)
                 stationsTransmitting.push_back(station);
@@ -39,7 +45,7 @@ int main()
             for (int station : stationsTransmitting)
             {
                 ++collisions[station];
-                nextSlot[station] += (getNextRandom() % static_cast<int>(pow(2.0, collisions[station]))) + 1;
+                nextSlot[station] += (getNextRandom(rand_numbers) % static_cast<int>(std::pow(2.0, collisions[station]))) + 1;
                 printf("Station %d: backing off to slot %d collisions: %d\n", station, nextSlot[station], collisions[station]);
             }
         }
@@ -56,14 +62,6 @@ int main()
         std::cout << "\n\n";
         ++slot;
     }
-}
-
-int getNextRandom()
-{
-    int currentNumber;
-    if (random_numbers_file >> currentNumber)
-        return currentNumber;
-    return 0;
 }
 
 void printLineSeparator()
