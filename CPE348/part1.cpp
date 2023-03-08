@@ -6,7 +6,7 @@
 typedef double f64;
 
 const f64 TIMESLOTLENGTH{51.2};
-const uint8_t NUMBER_OF_STATIONS{5};
+const u8 NUMBER_OF_STATIONS{5};
 
 // array holding data for each station
 int nextSlot[NUMBER_OF_STATIONS] = {0, 0, 0, 0, 0};

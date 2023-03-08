@@ -66,6 +66,10 @@
         "stack": "cpp",
         "variant": "cpp",
         "numeric": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "__hash_table": "cpp",
+        "__node_handle": "cpp",
+        "complex": "cpp",
+        "algorithm": "cpp"
     }
 }
