@@ -70,6 +70,16 @@
         "__hash_table": "cpp",
         "__node_handle": "cpp",
         "complex": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "bit": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "memory_resource": "cpp",
+        "numbers": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "cinttypes": "cpp",
+        "set": "cpp",
+        "thread": "cpp"
     }
 }

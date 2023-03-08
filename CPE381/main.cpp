@@ -35,21 +35,7 @@ int main(int argc, char *argv[])
 	wavFile_output.write(data, sizeof(data));
 	wavHeader = reinterpret_cast<WAV_HEADER &>(data);
 
-	u32 firstByte = static_cast<u32>(data[40]);
-	u32 secondByte = static_cast<u32>(data[41]);
-	u32 thirdByte = static_cast<u32>(data[42]);
-	u32 fourthByte = static_cast<u32>(data[43]);
-
-	printf("\n\n%x\n\n", wavHeader.Subchunk2Size);
-
-	printf("%x %x %x %x\n", data[43], data[42], data[41], data[40] & 0xFF);
-
-	std::cout << static_cast<u32>(data[43] << 24 | data[42] << 16 | data[41] << 8 | (data[40] & 0xFF)) << std::endl;
-
-	std::cout << std::endl
-			  << std::string(78, '-') << std::endl;
-
-	std::cout << std::setprecision(6);
+	std::cout << std::endl << std::string(78, '-') << std::endl;
 
 	if (bytesRead > 0)
 	{
@@ -69,8 +55,6 @@ int main(int argc, char *argv[])
 
 		i32 max_channel_1_post_noise = -65000;
 		i32 max_channel_2_post_noise = -65000;
-
-		u64 bytes_processed = 0;
 
 		while (wavFile_input.read(reinterpret_cast<char *>(input.get()), 4))
 		{
@@ -95,39 +79,7 @@ int main(int argc, char *argv[])
 			max_channel_2_post_noise = std::max(max_channel_2_post_noise, static_cast<i32>(result[1]));
 
 			wavFile_output.write(reinterpret_cast<const char *>(result.get()), sizeof(u32));
-			bytes_processed += 4;
-
-			float progress = 0.0;
-			while (progress < 1.0)
-			{
-				int barWidth = 70;
-
-				std::cout << "[";
-				int pos = barWidth * (static_cast<f64>(bytes_processed) / static_cast<f64>(wavHeader.Subchunk2Size));
-				for (int i = 0; i < barWidth; ++i)
-				{
-					if (i < pos)
-						std::cout << "\033[42m.\033[0m";
-					else if (i == pos)
-						std::cout << ">";
-					else
-						std::cout << ".";
-				}
-				std::cout << "] " << static_cast<i16>((static_cast<f64>(bytes_processed) / static_cast<f64>(wavHeader.Subchunk2Size)) * 100) << " %\r";
-				std::cout.flush();
-
-				progress += 4; // for demonstration only
-			}
-			//std::cout << std::endl;
-
-			//std::cout << "Processing data....." << (static_cast<f64>(bytes_processed) / static_cast<f64>(wavHeader.Subchunk2Size)) * 100 << std::string(10, ' ') << "\r";
-			std::cout.flush();
 		}
-
-		std::cout << std::endl;
-
-			std::cout << std::string(78, '-') << std::endl;
-
 		auto stop_time = std::chrono::high_resolution_clock::now();
 		print_data(wavHeader, std::chrono::duration_cast<std::chrono::nanoseconds>(stop_time - start_time).count(), numSamples);
 		print_summary_text_file(wavHeader,

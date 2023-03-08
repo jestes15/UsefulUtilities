@@ -71,8 +71,8 @@ void print_data(WAV_HEADER &wavHeader,
 }
 
 void print_summary_text_file(WAV_HEADER &wavHeader,
-							 std::chrono::steady_clock::time_point start_time,
-							 std::chrono::steady_clock::time_point stop_time,
+							 std::chrono::system_clock::time_point start_time,
+							 std::chrono::system_clock::time_point stop_time,
 							 u64 numSamples,
 							 i32 max_channel_1_pre_noise,
 							 i32 max_channel_2_pre_noise,
