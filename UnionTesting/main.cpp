@@ -22,7 +22,7 @@ union WAV_HEADER
         u8 fmt[4];         // FMT header
         u32 Subchunk1Size; // Size of the fmt chunk
         uint16_t AudioFormat;   // Audio format 1=PCM,6=mulaw,7=alaw,     257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
-        uint16_t NumOfChan;     // Number of channels 1=Mono 2=Sterio
+        uint16_t numChannels;     // Number of channels 1=Mono 2=Sterio
         u32 SamplesPerSec; // Sampling Frequency in Hz
         u32 bytesPerSec;   // bytes per second
         uint16_t blockAlign;    // 2=16-bit mono, 4=16-bit stereo
@@ -50,7 +50,7 @@ int main()
     // Display the sampling Rate from the header
     std::cout << "Sampling Rate:\t\t\t" << wavHeader.SamplesPerSec << " Hz" << std::endl;
     std::cout << "Number of bits used:\t\t" << wavHeader.bitsPerSample << std::endl;
-    std::cout << "Number of channels:\t\t" << wavHeader.NumOfChan << std::endl;
+    std::cout << "Number of channels:\t\t" << wavHeader.numChannels << std::endl;
     std::cout << "Number of bytes per second:\t" << wavHeader.bytesPerSec << std::endl;
     std::cout << "Data length:\t\t\t" << wavHeader.Subchunk2Size << std::endl;
     std::cout << "Audio Format:\t\t\t" << wavHeader.AudioFormat << std::endl;

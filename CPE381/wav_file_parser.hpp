@@ -34,7 +34,7 @@ struct WAV_HEADER
 	u8 fmt[4];		   // FMT header
 	u32 Subchunk1Size; // Size of the fmt chunk
 	u16 AudioFormat;   // Audio format 1=PCM,6=mulaw,7=alaw,     257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
-	u16 NumOfChan;	   // Number of channels 1=Mono 2=Sterio
+	u16 numChannels;	   // Number of channels 1=Mono 2=Sterio
 	u32 SamplesPerSec; // Sampling Frequency in Hz
 	u32 bytesPerSec;   // bytes per second
 	u16 blockAlign;	   // 2=16-bit mono, 4=16-bit stereo
@@ -56,7 +56,7 @@ void print_data(WAV_HEADER &wavHeader,
 
 	std::cout << "Sampling Rate:\t\t\t" << wavHeader.SamplesPerSec << " Hz" << std::endl;
 	std::cout << "Number of bits used:\t\t" << wavHeader.bitsPerSample << std::endl;
-	std::cout << "Number of channels:\t\t" << wavHeader.NumOfChan << std::endl;
+	std::cout << "Number of channels:\t\t" << wavHeader.numChannels << std::endl;
 	std::cout << "Number of bytes per second:\t" << wavHeader.bytesPerSec << std::endl;
 	std::cout << "Data length:\t\t\t" << wavHeader.Subchunk2Size << std::endl;
 	std::cout << "Audio Format:\t\t\t" << wavHeader.AudioFormat << std::endl;
@@ -65,12 +65,9 @@ void print_data(WAV_HEADER &wavHeader,
 	std::cout << "Data string:\t\t\t" << wavHeader.Subchunk2ID[0] << wavHeader.Subchunk2ID[1] << wavHeader.Subchunk2ID[2] << wavHeader.Subchunk2ID[3] << std::endl;
 
 	std::cout << "Number of samples:\t\t" << numSamples << std::endl;
-
-	std::cout << "Total time: " << time_delta << " ns" << std::endl;
-	std::cout << "Seconds: " << (numSamples / 2) / wavHeader.SamplesPerSec << " s" << std::endl;
 }
 
-void print_summary_text_file(WAV_HEADER &wavHeader,
+void print_summary_text_file_1(WAV_HEADER &wavHeader,
 							 std::chrono::system_clock::time_point start_time,
 							 std::chrono::system_clock::time_point stop_time,
 							 u64 numSamples,
@@ -79,7 +76,7 @@ void print_summary_text_file(WAV_HEADER &wavHeader,
 							 i32 max_channel_1_post_noise,
 							 i32 max_channel_2_post_noise)
 {
-	std::ofstream test_file("Estes_J_sim.txt", std::ios::out);
+	std::ofstream test_file("Estes_J_sim_1.txt", std::ios::out);
 	test_file << std::left << std::setw(50) << "Name:"
 			  << "Joshua Estes" << std::endl;
 	test_file << std::left << std::setw(50) << "File Name:"
@@ -88,7 +85,34 @@ void print_summary_text_file(WAV_HEADER &wavHeader,
 	test_file << std::left << std::setw(50) << "Number of samples:" << numSamples / 2 << std::endl;
 	test_file << std::left << std::setw(50) << "Sampling Frequency:" << wavHeader.SamplesPerSec << std::endl;
 	test_file << std::left << std::setw(50) << "Number of bits per sample:" << wavHeader.bitsPerSample << std::endl;
-	test_file << std::left << std::setw(50) << "Record length:" << numSamples / (wavHeader.NumOfChan * wavHeader.SamplesPerSec) << std::endl;
+	test_file << std::left << std::setw(50) << "Record length:" << numSamples / (wavHeader.numChannels * wavHeader.SamplesPerSec) << std::endl;
+	test_file << std::left << std::setw(50) << "Maximum value in channel 1 before noise:" << max_channel_1_pre_noise << std::endl;
+	test_file << std::left << std::setw(50) << "Maximum value in channel 2 before noise:" << max_channel_2_pre_noise << std::endl;
+	test_file << std::left << std::setw(50) << "Maximum value in channel 1 after noise:" << max_channel_1_post_noise << std::endl;
+	test_file << std::left << std::setw(50) << "Maximum value in channel 2 after noise:" << max_channel_2_post_noise << std::endl;
+	test_file << std::left << std::setw(50) << "Execution time in nanoseconds:" << std::chrono::duration_cast<std::chrono::nanoseconds>(stop_time - start_time).count() << " nanoseconds" << std::endl;
+	test_file << std::left << std::setw(50) << "Execution time in milliseconds:" << std::chrono::duration_cast<std::chrono::milliseconds>(stop_time - start_time).count() << " milliseconds";
+}
+
+void print_summary_text_file_2(WAV_HEADER &wavHeader,
+							 std::chrono::system_clock::time_point start_time,
+							 std::chrono::system_clock::time_point stop_time,
+							 u64 numSamples,
+							 i32 max_channel_1_pre_noise,
+							 i32 max_channel_2_pre_noise,
+							 i32 max_channel_1_post_noise,
+							 i32 max_channel_2_post_noise)
+{
+	std::ofstream test_file("Estes_J_sim_2.txt", std::ios::out);
+	test_file << std::left << std::setw(50) << "Name:"
+			  << "Joshua Estes" << std::endl;
+	test_file << std::left << std::setw(50) << "File Name:"
+			  << "Estes_J_sim.txt" << std::endl;
+	// Assumes each sample is comprised of two samples which correspond to a channel
+	test_file << std::left << std::setw(50) << "Number of samples:" << numSamples / 2 << std::endl;
+	test_file << std::left << std::setw(50) << "Sampling Frequency:" << wavHeader.SamplesPerSec << std::endl;
+	test_file << std::left << std::setw(50) << "Number of bits per sample:" << wavHeader.bitsPerSample << std::endl;
+	test_file << std::left << std::setw(50) << "Record length:" << numSamples / (wavHeader.numChannels * wavHeader.SamplesPerSec) << std::endl;
 	test_file << std::left << std::setw(50) << "Maximum value in channel 1 before noise:" << max_channel_1_pre_noise << std::endl;
 	test_file << std::left << std::setw(50) << "Maximum value in channel 2 before noise:" << max_channel_2_pre_noise << std::endl;
 	test_file << std::left << std::setw(50) << "Maximum value in channel 1 after noise:" << max_channel_1_post_noise << std::endl;
