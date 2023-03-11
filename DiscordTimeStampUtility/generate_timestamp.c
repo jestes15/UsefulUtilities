@@ -1,18 +1,23 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 int main(int argc, char** argv) {
     if (argc != 3) {
-        printf("usage: %s -[t | T | d | D | f | F  R] <time string>", argv[0]);
+        printf("usage: %s -[t | T | d | D | f | F  R] <month-day-year hour:minute:second>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
     struct tm t;
-    if (sscanf(argv[2], "%d-%d-%d %d:%d:%d", &t.tm_mon, &t.tm_mday, &t.tm_year, &t.tm_hour, &t.tm_min, &t.tm_sec)) {
-        printf("invalid time string");
-        return EXIT_FAILURE;
-    }
+if (!sscanf(argv[2], "%d-%d-%d %d:%d:%d", &t.tm_mon, &t.tm_mday, &t.tm_year, &t.tm_hour, &t.tm_min, &t.tm_sec)) {
+    perror("Error: ");
+    return EXIT_FAILURE;
+}
+
+// Adjust tm_year to start at 1900 and tm_mon to be in the range [0,11]
+t.tm_year -= 1900;
+t.tm_mon -= 1;
 
     time_t time_stamp = mktime(&t);
 
