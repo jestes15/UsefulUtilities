@@ -75,7 +75,7 @@ int main()
 		wavFile_output.write(reinterpret_cast<const char *>(result.get()), sizeof(u32));
 	}
 	auto stop_time = std::chrono::high_resolution_clock::now();
-	print_summary_text_file_1(wavHeader, start_time, stop_time, numSamples, max_channel_1_pre_noise, max_channel_2_pre_noise, max_channel_1_post_noise, max_channel_2_post_noise);
+	print_summary_text_file(wavHeader, start_time, stop_time, numSamples, max_channel_1_pre_noise, max_channel_2_pre_noise, max_channel_1_post_noise, max_channel_2_post_noise);
 
 	wavFile_input.close();
 	wavFile_output.close();

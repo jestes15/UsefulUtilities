@@ -43,44 +43,44 @@ struct WAV_HEADER
 	/* "data" sub-chunk */
 	u8 Subchunk2ID[4]; // "data"  string
 	u32 Subchunk2Size; // Sampled data length
+
+	friend std::ostream& operator <<(std::ostream& stream, WAV_HEADER &header) {
+		stream << std::endl << "RIFF header:\t\t\t" << header.RIFF[0] << header.RIFF[1] << header.RIFF[2] << header.RIFF[3] << std::endl;
+		stream << "FMT:\t\t\t\t" << header.fmt[0] << header.fmt[1] << header.fmt[2] << header.fmt[3] << std::endl;
+		stream << "Data size:\t\t\t" << header.ChunkSize << std::endl;
+		stream << "Sampling Rate:\t\t\t" << header.SamplesPerSec << " Hz" << std::endl;
+		stream << "Number of bits used:\t\t" << header.bitsPerSample << std::endl;
+		stream << "Number of channels:\t\t" << header.numChannels << std::endl;
+		stream << "Number of bytes per second:\t" << header.bytesPerSec << std::endl;
+		stream << "Data length:\t\t\t" << header.Subchunk2Size << std::endl;
+		stream << "Audio Format:\t\t\t" << header.AudioFormat << std::endl;
+		stream << "Block align:\t\t\t" << header.blockAlign << std::endl;
+		stream << "Data string:\t\t\t" << header.Subchunk2ID[0] << header.Subchunk2ID[1] << header.Subchunk2ID[2] << header.Subchunk2ID[3] << std::endl;
+		return stream;
+	}
 };
 
-void print_data(WAV_HEADER &wavHeader,
-				u64 time_delta,
-				u64 numSamples)
+void print_data(WAV_HEADER &wavHeader, u64 numSamples)
 {
-	std::cout << "RIFF header:\t\t\t" << wavHeader.RIFF[0] << wavHeader.RIFF[1] << wavHeader.RIFF[2] << wavHeader.RIFF[3] << std::endl;
-	std::cout << "WAVE header:\t\t\t" << wavHeader.WAVE[0] << wavHeader.WAVE[1] << wavHeader.WAVE[2] << wavHeader.WAVE[3] << std::endl;
-	std::cout << "FMT:\t\t\t\t" << wavHeader.fmt[0] << wavHeader.fmt[1] << wavHeader.fmt[2] << wavHeader.fmt[3] << std::endl;
-	std::cout << "Data size:\t\t\t" << wavHeader.ChunkSize << std::endl;
-
-	std::cout << "Sampling Rate:\t\t\t" << wavHeader.SamplesPerSec << " Hz" << std::endl;
-	std::cout << "Number of bits used:\t\t" << wavHeader.bitsPerSample << std::endl;
-	std::cout << "Number of channels:\t\t" << wavHeader.numChannels << std::endl;
-	std::cout << "Number of bytes per second:\t" << wavHeader.bytesPerSec << std::endl;
-	std::cout << "Data length:\t\t\t" << wavHeader.Subchunk2Size << std::endl;
-	std::cout << "Audio Format:\t\t\t" << wavHeader.AudioFormat << std::endl;
-
-	std::cout << "Block align:\t\t\t" << wavHeader.blockAlign << std::endl;
-	std::cout << "Data string:\t\t\t" << wavHeader.Subchunk2ID[0] << wavHeader.Subchunk2ID[1] << wavHeader.Subchunk2ID[2] << wavHeader.Subchunk2ID[3] << std::endl;
-
-	std::cout << "Number of samples:\t\t" << numSamples << std::endl;
+	std::cout << wavHeader << "Number of samples:\t\t" << numSamples << std::endl;
 }
 
 void print_summary_text_file(WAV_HEADER &wavHeader,
 							 std::chrono::system_clock::time_point start_time,
 							 std::chrono::system_clock::time_point stop_time,
+							 std::string file_name,
 							 u64 numSamples,
 							 i32 max_channel_1_pre_noise,
 							 i32 max_channel_2_pre_noise,
 							 i32 max_channel_1_post_noise,
 							 i32 max_channel_2_post_noise)
 {
-	std::ofstream test_file("Estes_J_sim.txt", std::ios::out);
+	std::ofstream test_file("Estes_J_sum.txt", std::ios::out);
 	test_file << std::left << std::setw(50) << "Name:"
 			  << "Joshua Estes" << std::endl;
 	test_file << std::left << std::setw(50) << "File Name:"
-			  << "Estes_J_sim.txt" << std::endl;
+			  << file_name << std::endl;
+	test_file << std::left << std::setw(50) << "Number of samples in total:" << numSamples << std::endl;
 	// Assumes each sample is comprised of two samples which correspond to a channel
 	test_file << std::left << std::setw(50) << "Number of samples:" << numSamples / 2 << std::endl;
 	test_file << std::left << std::setw(50) << "Sampling Frequency:" << wavHeader.SamplesPerSec << std::endl;
